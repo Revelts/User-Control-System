@@ -1,16 +1,15 @@
 <?php
 // ************************************************************************************//
-// * User Control Panel ( UCP )
+// * User Control Panel ( UCP ) >> PDO Edition <<
 // ************************************************************************************//
 // * Author: DerStr1k3r
 // ************************************************************************************//
-// * Version: 1.0
+// * Version: 1.1
 // * 
 // * Copyright (c) 2020 DerStr1k3r. All rights reserved.
 // ************************************************************************************//
 // * License Typ: Creative Commons licenses
 // ************************************************************************************//
-session_start();
 
 // ************************************************************************************//
 // * MySQL Database Connection
@@ -33,19 +32,25 @@ define("USERPROFILECHANGE","User Profil bearbeiten");
 // ************************************************************************************//
 // * Default Language Section - Footer
 // ************************************************************************************//
-define("DISCORD","https://discord.gg/xxxxxx");
-define("TEAMSPEAK","ts3server://xxxxxx?port=9987");
-define("IMPRINT","https://xxxxxx/impressum.html"); 
+define("DISCORD","https://discord.gg/cGf73tD");
+define("TEAMSPEAK","ts3server://ts3.destiny-life.ml?port=9987");
+define("IMPRINT","https://destiny-life.ml/impressum.html"); 
 
-// MySQL Account Dats
-$conn = mysqli_connect(
-			"" . MYSQL_HOST . "",
-			"" . MYSQL_USER . "",
-			"" . MYSQL_PASSWORD . "",
-			"" . MYSQL_DATABASE . "");
+// ************************************************************************************//
+// * PDO options / configuration details.
+// ************************************************************************************// 
+$pdoOptions = array(
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_EMULATE_PREPARES => false
+);
 
-// MySQL Error Msg			
-if(!$conn){
-	die("Connection error: " . mysqli_connect_error());	
-}
+// ************************************************************************************//
+// * Connect to MySQL and instantiate the PDO object.
+// ************************************************************************************//  
+$pdo = new PDO(
+    "mysql:host=" . MYSQL_HOST . ";dbname=" . MYSQL_DATABASE, //DSN
+    MYSQL_USER, //Username
+    MYSQL_PASSWORD, //Password
+    $pdoOptions //Options
+);
 ?>
