@@ -1,18 +1,18 @@
 <?php 
 // ************************************************************************************//
-// * User Control Panel ( UCP )
+// * User Control Panel ( UCP ) >> PDO Edition <<
 // ************************************************************************************//
 // * Author: DerStr1k3r
 // ************************************************************************************//
-// * Version: 1.0
+// * Version: 1.1
 // * 
 // * Copyright (c) 2020 DerStr1k3r. All rights reserved.
 // ************************************************************************************//
-// * License Typ: GNU GPLv3
+// * License Typ: Creative Commons licenses
 // ************************************************************************************//
 
 function site_secure() {
-	if(!isset($_SESSION['secure'])) {
+	if(!isset($_SESSION['secure']) || !isset($_SESSION['secure_logged_in']) || !isset($_COOKIE["secure"])){
 		site_header();
 		site_navi_nologged();
 		site_content_nologged();
@@ -39,7 +39,7 @@ function site_secure() {
         </div>
       </div>";
 		site_footer();
-		die();
+		exit;
 	}  
 }
 
@@ -202,6 +202,36 @@ echo "
 site_footer();
 }
 
+function site_register_already_user() {
+site_header();
+site_navi_nologged();
+site_content_nologged();
+
+echo "
+        <div class='content'>
+         <div class='row'>
+          <div class='col-md-12'>
+            <div class='card'>
+              <div class='card-header'>
+                <h5 class='title'>Willkommen bei ".PROJECTNAME."!</h5>
+                <p class='category'>User Control Panel | Secure System</p>
+              </div>
+              <div class='card-body'>			  
+				<div class='row'>			
+					<div class='col-sm-8'>
+						<b>Den Benutzer gibt es schon!</b>
+					</div>				
+				</div>										
+              </div>
+            </div>
+			</form>
+          </div>
+        </div>
+      </div>";
+site_footer();
+die();
+}
+
 function site_login_password_none_correct() {
 site_header();
 site_navi_nologged();
@@ -273,7 +303,6 @@ if (ini_get("session.use_cookies")) {
        $params["domain"], $params["secure"], $params["httponly"]
 	);
 } 	
-	
 session_unset();
 session_destroy();
 site_navi_nologged();
@@ -318,31 +347,40 @@ echo "
   <title>
     ".SITETITLE."
   </title>";
-	$username = trim($_POST['username']);
-	$password = trim($_POST['password']);
-	$securecode = $row["id"];
+			$_SESSION['secure'] = $user['id'];
+			$_SESSION['secure_logged_in'] = time()+2592000;
+			setCookie("secure",$user['id'],time()+2592000);
 	
-	session_start();
-	$_SESSION["secure"] = sitehash($securecode);	
-	$sql = "select * from accounts where username = '".$username."'";
-	$rs = mysqli_query($conn,$sql);
-	$numRows = mysqli_num_rows($rs);
-	
-	if($numRows  > 0){
-		$row = mysqli_fetch_assoc($rs);
-		$_SESSION['secure'] = $securecode;
-		$expires = time()+2592000;
-		$securecode = $row["id"];
-		setcookie("secure", $securecode, $expires,  "/");
-		if(isset($_POST["username"]) && ! empty($_POST["username"]))
-		{
-			setCookie("secure",$row["id"],time()+2592000);
-		} 			
-		header("Location:dashboard.php");
-	}
-	
-  
+echo "  
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+  <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700,200' rel='stylesheet' />
+  <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.1/css/all.css' integrity='sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr' crossorigin='anonymous'>
+  <link href='themes/destiny-life/assets/css/bootstrap.min.css' rel='stylesheet' />
+  <link href='themes/destiny-life/assets/css/now-ui-dashboard.php?v=1.5.0' rel='stylesheet' />
+  <link href='themes/destiny-life/assets/site/site.php' rel='stylesheet' />
+</head>
 
+<body class=''>
+  <div class='wrapper '>";   
+}
+
+function site_header_logged() {
+echo "
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8' />
+  <link rel='apple-touch-icon' sizes='76x76' href='themes/destiny-life/assets/img/apple-icon.png'>
+  <link rel='icon' type='image/png' href='themes/destiny-life/assets/img/favicon.png'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />
+  <title>
+    ".SITETITLE."
+  </title>";
+			$_SESSION['secure'] = $user['id'];
+			$_SESSION['secure_logged_in'] = time()+2592000;
+			setCookie("secure",$user['id'],time()+2592000);
+	
 echo " 
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
   <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700,200' rel='stylesheet' />
