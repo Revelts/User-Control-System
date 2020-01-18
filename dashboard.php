@@ -1,26 +1,22 @@
 <?php
 // ************************************************************************************//
-// * User Control Panel ( UCP )
+// * User Control Panel ( UCP ) >> PDO Edition <<
 // ************************************************************************************//
 // * Author: DerStr1k3r
 // ************************************************************************************//
-// * Version: 1.0
+// * Version: 1.1
 // * 
 // * Copyright (c) 2020 DerStr1k3r. All rights reserved.
 // ************************************************************************************//
-// * License Typ: GNU GPLv3
+// * License Typ: Creative Commons licenses
 // ************************************************************************************//
 require_once("include/features.php");
 
-$username = trim($row["username"]);
-$sql = "select id from accounts where username = '".$username."'";
-$rs = mysqli_query($conn,$sql);
-
-$cookie = $_COOKIE["username"]; 
+session_start();
 
 site_secure();
 
-site_header();
+site_header_logged();
 site_navi_logged();
 site_content_logged();
 
@@ -37,14 +33,15 @@ echo "
 			<div class='row'>			
 				<div class='col-sm-12'>
 					<b>Willkommen ";
-					$id = 0 + $_COOKIE["secure"];
-					$securecode = $row["id"];
 					$sql = "SELECT username FROM accounts WHERE id = ".$_COOKIE["secure"]."";
-					$result = $conn->query($sql);
+					$stmt = $pdo->prepare($sql);
+					$stmt->bindValue(':username', $username);
+					$stmt->execute();
+					$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-					if ($result->num_rows > 0) {
+					if($result){
 						// output data of each row
-						while($row = $result->fetch_assoc()) {
+						while($row = $stmt->fetch()) {
 							echo"".$row["username"]."";
 						}
 					}		
