@@ -1,10 +1,10 @@
 <?php
 // ************************************************************************************//
-// * User Control Panel ( UCP )
+// * User Control Panel ( UCP ) >> PDO Edition <<
 // ************************************************************************************//
 // * Author: DerStr1k3r
 // ************************************************************************************//
-// * Version: 1.0
+// * Version: 1.1
 // * 
 // * Copyright (c) 2020 DerStr1k3r. All rights reserved.
 // ************************************************************************************//
@@ -12,36 +12,47 @@
 // ************************************************************************************//
 require_once("include/features.php");
 
-if(isset($_POST['submit'])){
+if(isset($_POST['register'])){
 	
-		$username = stripslashes($_POST['username']);
-		$email 	= stripslashes($_POST['email']);	
-		$socialClub = stripslashes($_POST['socialClub']);
-		$password = stripslashes($_POST['password']);
-		
-		$commandName = stripslashes($_POST['commandName']);
-		$ingameName = stripslashes($_POST['ingameName']);
+    $username = !empty($_POST['username']) ? trim($_POST['username']) : null;
+    $pass = !empty($_POST['password']) ? trim($_POST['password']) : null;
+    
+    $sql = "SELECT COUNT(username) AS num FROM accounts WHERE username = :username";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':username', $username);
 
-		$hashPassword = password_hash($password,PASSWORD_BCRYPT);
-		
-		$accountId = $_SESSION['secure'];
-		
-		$sql = "insert into accounts (username, email, password, socialClub) value('".$username."', '".$email."', '".$hashPassword."','".$socialClub."')";
-		$result = mysqli_query($conn, $sql);
-		$sql2 = "insert into characters (commandName, ingameName) value('".$commandName."', '".$ingameName."')";
-		$result2 = mysqli_query($conn, $sql2);
-		if($result)
-		{
-			site_register_done();
-		}
+    $stmt->execute();
 
-		// Platzhalter ^^
-		if($result2)
-		{
-			// Test
-			die();
-		}
-		$conn->close();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if($row['num'] > 0){
+        site_register_already_user();
+    }
+	
+    $passwordHash = password_hash($pass, PASSWORD_BCRYPT);
+
+    $sql = "INSERT INTO accounts (username, email, password) VALUES (:username, :email, :password)";
+    $stmt = $pdo->prepare($sql);
+	
+    $sql2 = "INSERT INTO characters (commandName, ingameName) VALUES (:commandName, :ingameName)";
+    $stmt2 = $pdo->prepare($sql2);	
+	
+    $stmt->bindValue(':username', $username);
+	$stmt->bindValue(':email', $email);
+    $stmt->bindValue(':password', $passwordHash);
+	
+	$stmt2->bindValue(':commandName', $commandName);
+	$stmt2->bindValue(':ingameName', $ingameName);
+ 
+    $result = $stmt->execute();
+	$result2 = $stmt2->execute();
+
+    if($result){
+        site_register_done();
+    }
+    if($result2){
+        // Platzhalter
+    }
 }
 
 site_header();
@@ -95,7 +106,7 @@ echo "
 					<b>Hinweis:</b> Felder mit <span class='pflichtfeld'>*</span> müssen ausgefüllt werden.
 					<br />
 					<br />
-					<button type='submit' class='btn btn-primary' onclick='nowuiDashboard.showNotification('top','center')' name='submit'>Registrieren</submit>			
+					<button type='submit' class='btn btn-primary' name='register'>Registrieren</submit>			
 				</div>
 			</div>			
 			
